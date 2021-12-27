@@ -1,9 +1,6 @@
 package simulation;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Objects;
-import java.util.Random;
+import java.util.*;
 
 public class Genome {
 
@@ -22,6 +19,7 @@ public class Genome {
         for (int i = 0; i < Genome.GENOME_SIZE; i++) {
             this.genomeValue.add(i, random.nextInt(Genome.MAX_GENE_VALUE) + Genome.MIN_GENE_VALUE);
         }
+        Collections.sort(this.genomeValue);
     }
 
     Genome(ArrayList<Integer> genomeValue) {
@@ -35,9 +33,17 @@ public class Genome {
        return this.genomeValue.get(random.nextInt(Genome.GENOME_SIZE));
     }
 
+    public void sortGenome() {
+        Collections.sort(this.genomeValue);
+    }
+
 
     Genome mixGenomes(Genome secondGenome, int secondGenomeParticipationPercentage) {
         ArrayList<Integer> newGenome = new ArrayList<>(Genome.GENOME_SIZE);
+
+        this.sortGenome();
+        secondGenome.sortGenome();
+
         int secondGenomeParticipation = (Genome.GENOME_SIZE * secondGenomeParticipationPercentage) / 100;
         for (int i = 0; i < secondGenomeParticipation; i++) {
             newGenome.add(i, secondGenome.getRandomGene());
@@ -47,7 +53,11 @@ public class Genome {
             newGenome.add(i + secondGenomeParticipation, this.getRandomGene());
         }
 
-        return new Genome(newGenome);
+        Genome mixedGenome = new Genome(newGenome);
+
+        mixedGenome.sortGenome();
+
+        return mixedGenome;
     }
 
     @Override
@@ -65,5 +75,11 @@ public class Genome {
     @Override
     public int hashCode() {
         return Objects.hash(genomeValue);
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder builder = new StringBuilder((this.genomeValue.stream().map(Object::toString).reduce((str, acc) -> acc + str).get()));
+        return builder.reverse().toString();
     }
 }

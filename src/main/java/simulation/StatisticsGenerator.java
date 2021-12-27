@@ -49,6 +49,7 @@ public class StatisticsGenerator {
         }
         return recentSnapshots;
     }
+
     public SimulationStateSnapshot getLastSnapshot() {
         if (this.snapshots.size() == 0) {
             return null;
@@ -56,7 +57,42 @@ public class StatisticsGenerator {
         return this.snapshots.get(this.snapshots.size() - 1);
     }
 
+    public SimulationStateSnapshot getAverage() {
+        int animals = 0;
+        int plants = 0;
+        double childRate = 0;
+        double energy = 0;
+        double lifeSpan = 0;
+
+        for (SimulationStateSnapshot snap : this.snapshots) {
+            animals += snap.animalCount();
+            plants += snap.plantCount();
+            childRate += snap.averageChildRate();
+            energy += snap.averageEnergy();
+            lifeSpan += snap.averageLifeSpan();
+        }
+        if (snapshots.isEmpty()) {
+            return null;
+        }
+        return new SimulationStateSnapshot(animals / snapshots.size(),
+                plants / snapshots.size(), new ArrayList<>(),
+                energy / snapshots.size(), lifeSpan / snapshots.size(),
+                childRate / snapshots.size()
+        );
+    }
+
+    public ArrayList<SimulationStateSnapshot> getSnapshots() {
+        return snapshots;
+    }
+
     public int getEpochNumber() {
         return this.snapshots.size();
+    }
+
+    public Genome getDominantGenome() {
+        if (this.getLastSnapshot().dominantGenome().isEmpty()) {
+            return null;
+        }
+        return this.getLastSnapshot().dominantGenome().get(0);
     }
 }

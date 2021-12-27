@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class Animal implements IMapObject, IPositionChangeObservable {
-    final Genome genome;
+    public final Genome genome;
     private Vector2d position;
 
     private MapDirection facing;
@@ -88,6 +88,7 @@ public class Animal implements IMapObject, IPositionChangeObservable {
 
     public void eat(int energyIncrease) {
         this.energyValue = Math.min(this.energyValue + energyIncrease, this.initialEnergy);
+        this.sendEvent(AnimalEvent.EAT);
     }
     public void removeEnergy(int energyValue) {
         if (energyValue < 0) {
@@ -134,6 +135,7 @@ public class Animal implements IMapObject, IPositionChangeObservable {
 
     private void sendEvent(AnimalEvent event) {
         this.animalEventSubscribers.forEach((s) -> {
+            System.out.println(event.toString());
             s.accept(new Pair<>(event, this));
         });
     }
@@ -147,5 +149,9 @@ public class Animal implements IMapObject, IPositionChangeObservable {
 
     public Animal getLastChild() {
         return this.lastChild;
+    }
+
+    public void markAsDead() {
+        this.sendEvent(AnimalEvent.DEATH);
     }
 }

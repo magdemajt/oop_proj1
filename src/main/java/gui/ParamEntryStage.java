@@ -2,16 +2,12 @@ package gui;
 
 import javafx.geometry.Insets;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 import simulation.SimultationParamsState;
 
-import java.util.concurrent.Callable;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 public class ParamEntryStage extends Stage {
     void initialize(Consumer<SimultationParamsState> simultationParamsStateCallable) {
@@ -38,6 +34,9 @@ public class ParamEntryStage extends Stage {
         Label jungleRatioFieldLabel = new Label("Jungle ratio (percent)");
         TextField jungleRatioField = new TextField("40");
 
+        CheckBox mapOneBreedModeCheckBox = new CheckBox("Magic breed mode for map one?");
+        CheckBox mapTwoBreedModeCheckBox = new CheckBox("Magic breed mode for map two?");
+
         Button confirmButton = new Button("Proceed");
         confirmButton.setOnAction(e -> {
             int width = Integer.parseInt(widthField.getText(), 10);
@@ -46,8 +45,10 @@ public class ParamEntryStage extends Stage {
             int moveEnergy = Integer.parseInt(moveEnergyField.getText(), 10);
             int plantEnergy = Integer.parseInt(plantEnergyField.getText(), 10);
             int jungleRatio = Integer.parseInt(jungleRatioField.getText(), 10);
+            boolean isMagicMapOne = mapOneBreedModeCheckBox.isSelected();
+            boolean isMagicMapTwo = mapTwoBreedModeCheckBox.isSelected();
 
-            SimultationParamsState state = new SimultationParamsState(width, height, startEnergy, moveEnergy, plantEnergy, jungleRatio);
+            SimultationParamsState state = new SimultationParamsState(width, height, startEnergy, moveEnergy, plantEnergy, jungleRatio, isMagicMapOne, isMagicMapTwo);
 
             simultationParamsStateCallable.accept(state);
             this.close();
@@ -70,8 +71,10 @@ public class ParamEntryStage extends Stage {
 
         gridPane.add(jungleRatioFieldLabel, 0, 6);
         gridPane.add(jungleRatioField, 1, 6);
+        gridPane.add(mapOneBreedModeCheckBox , 0, 7);
+        gridPane.add(mapTwoBreedModeCheckBox , 0, 8);
 
-        gridPane.add(confirmButton, 0, 8);
+        gridPane.add(confirmButton, 0, 9);
 
 
         gridPane.setPadding(new Insets(10));

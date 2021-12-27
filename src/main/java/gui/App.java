@@ -1,15 +1,10 @@
 package gui;
 
-import com.sun.source.doctree.SummaryTree;
 import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import simulation.NormalSimulationEngine;
-import simulation.SimultationParamsState;
-import simulation.StatisticsGenerator;
-import simulation.WallMap;
-
-import java.sql.Time;
-import java.util.concurrent.TimeUnit;
+import simulation.*;
 
 public class App extends Application {
 
@@ -25,30 +20,39 @@ public class App extends Application {
             primaryStage.close();
         }
         WallMap wallMap = new WallMap(15, this.paramsState);
+        RoundedMap roundedMap = new RoundedMap(15, this.paramsState);
         StatisticsGenerator generator = new StatisticsGenerator(wallMap);
-        NormalSimulationEngine engine = new NormalSimulationEngine(this.paramsState, wallMap, generator);
+        StatisticsGenerator generatorTwo = new StatisticsGenerator(roundedMap);
+
+        AnimalBreeder breederOne = paramsState.isMagicBreedModeMapOne() ? new MagicAnimalBreeder(wallMap, () -> {
+            Platform.runLater(() -> {
+                Alert a = new Alert(Alert.AlertType.INFORMATION, "Magic breeding in progress");
+                a.show();
+            });
+        }) : new AnimalBreeder(wallMap);
+        AnimalBreeder breederTwo = paramsState.isMagicBreedModeMapTwo() ? new MagicAnimalBreeder(roundedMap, () -> {}) : new AnimalBreeder(roundedMap);
+
+        NormalSimulationEngine engine = new NormalSimulationEngine(this.paramsState, wallMap, generator, breederOne);
+        NormalSimulationEngine engineTwo = new NormalSimulationEngine(this.paramsState, roundedMap, generatorTwo, breederTwo);
 
         SimulationStage s1 = new SimulationStage();
+        SimulationStage s2 = new SimulationStage();
         s1.setParams(engine, wallMap, generator);
+        s2.setParams(engineTwo, roundedMap, generatorTwo);
 
         s1.draw();
+        s2.draw();
+
+
         s1.show();
+        s2.show();
 
         Thread thread = new Thread(engine);
+        Thread threadTwo = new Thread(engineTwo);
 
         thread.start();
 
-        Thread timeThread = new Thread(() -> {
-            try {
-                TimeUnit.SECONDS.sleep(100);
-                thread.interrupt();
-                s1.close();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-        });
-
-        timeThread.start();
+        threadTwo.start();
 
 
     }

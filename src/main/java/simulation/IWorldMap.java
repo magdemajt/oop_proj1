@@ -15,4 +15,5 @@ public interface IWorldMap {
     void removeObjectFromList(IMapObject obj, Vector2d position);
     void clearEmptyLists();
     void setAnimalListeners(Animal a);
+    Vector2d getRandomFreePosition();
 }

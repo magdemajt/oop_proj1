@@ -14,6 +14,11 @@ public abstract class AbstractWorldMap implements IWorldMap {
 
     abstract public boolean canMoveTo(Vector2d position);
 
+    AbstractWorldMap(int initialAnimals, SimultationParamsState params) {
+        this.mapSize = new Vector2d(params.mapWidth(), params.mapHeight());
+        this.generateInitialAnimals(initialAnimals, params);
+    }
+
     public void placeObject(IMapObject object, Vector2d position) {
         List<IMapObject> objectsAtPosition = new LinkedList<>();
         if (this.mapObjects.containsKey(position)) {
@@ -140,5 +145,20 @@ public abstract class AbstractWorldMap implements IWorldMap {
             cleanObjectsMap.put(key, value);
         });
         this.mapObjects = cleanObjectsMap;
+    }
+
+    public Vector2d getRandomFreePosition() {
+
+        Random randomX = new Random();
+        Random randomY = new Random();
+
+
+        Vector2d positionProposition = new Vector2d(randomX.nextInt(this.mapSize.x), randomY.nextInt(this.mapSize.y));
+        int failureCounter = 0;
+        while (this.mapObjects.containsKey(positionProposition) && failureCounter < 100) {
+            positionProposition = new Vector2d(randomX.nextInt(this.mapSize.x), randomY.nextInt(this.mapSize.y));
+            failureCounter += 1;
+        }
+        return positionProposition;
     }
 }

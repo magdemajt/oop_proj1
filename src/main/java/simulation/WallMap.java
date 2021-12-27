@@ -3,9 +3,7 @@ package simulation;
 public class WallMap extends AbstractWorldMap {
 
     public WallMap(int initialAnimals, SimultationParamsState params) {
-        this.mapSize = new Vector2d(params.mapWidth(), params.mapHeight());
-        this.generateInitialAnimals(initialAnimals, params);
-
+        super(initialAnimals, params);
     }
 
     @Override

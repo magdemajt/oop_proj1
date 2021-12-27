@@ -26,12 +26,11 @@ public class NormalSimulationEngine implements ISimulationEngine {
 
     private AtomicLong deadAnimalsCombinedLifeSpan;
 
-
     private StatisticsGenerator statisticsGenerator;
 
-    public NormalSimulationEngine(SimultationParamsState paramsState, IWorldMap map, StatisticsGenerator statisticsGenerator) {
+    public NormalSimulationEngine(SimultationParamsState paramsState, IWorldMap map, StatisticsGenerator statisticsGenerator, AnimalBreeder animalBreeder) {
         this.paramsState = paramsState;
-        this.breeder = new AnimalBreeder(map);
+        this.breeder = animalBreeder;
         this.mover = new AnimalMover(paramsState.moveEnergy(), map);
         this.feeder = new AnimalFeeder(paramsState.plantEnergy(), map);
         JungleGenerationStrategy jungleGenerationStrategy = new JungleGenerationStrategy(paramsState.jungleRatio(), map.getMapSize());
@@ -63,6 +62,7 @@ public class NormalSimulationEngine implements ISimulationEngine {
             toRemove.forEach(v -> {
                 this.deadAnimalsCombinedLifeSpan.addAndGet(((Animal) v).getAliveFor());
                 this.map.removeObjectFromList(v, key);
+                ((Animal) v).markAsDead();
             });
         });
         this.map.clearEmptyLists();
@@ -145,7 +145,6 @@ public class NormalSimulationEngine implements ISimulationEngine {
 
     @Override
     public double getDeadAnimalsAverageLifeSpan() {
-        System.out.println(this.deadAnimalsCombinedLifeSpan.get() + " " + this.deadAnimals.get() + " " + (double) this.deadAnimalsCombinedLifeSpan.get() / this.deadAnimals.get());
         if (this.deadAnimals.get() == 0) {
             return 0.0;
         }

@@ -6,6 +6,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
+import javafx.scene.shape.StrokeType;
 import simulation.*;
 
 import java.util.List;
@@ -14,7 +15,13 @@ import java.util.function.Consumer;
 public class MapPane extends GridPane {
 
     static final int RECTANGlE_SIZE = 25;
-    public void paintMap(IWorldMap map, Consumer<Animal> animalClickHandler) {
+
+    private ObservedAnimalHandler observedAnimalHandler;
+
+    public void setObservedAnimalHandler(ObservedAnimalHandler handler) {
+        this.observedAnimalHandler = handler;
+    }
+    public void paintMap(IWorldMap map, Consumer<Animal> animalClickHandler, Genome dominantGenome) {
         this.setHgap(5);
         this.setVgap(5);
         this.setPadding(new Insets(5));
@@ -32,6 +39,16 @@ public class MapPane extends GridPane {
                     Rectangle animalRectangle = new Rectangle(RECTANGlE_SIZE, RECTANGlE_SIZE);
                     Color rectangleColor = null;
                     if (mapObject instanceof Animal animal && animal.getEnergyValue() > 0) {
+                        if (this.observedAnimalHandler.isAnimalObserved(animal)) {
+                            animalRectangle.setStrokeType(StrokeType.INSIDE);
+                            animalRectangle.setStroke(new Color(0, 1, 0, 1));
+                            animalRectangle.setStrokeWidth(3);
+                        }
+                        if (animal.genome == dominantGenome) {
+                            animalRectangle.setStrokeType(StrokeType.CENTERED);
+                            animalRectangle.setStroke(new Color(0, 1, 1, 1));
+                            animalRectangle.setStrokeWidth(3);
+                        }
                         animalRectangle.setOnMouseClicked((e) -> {
                             animalClickHandler.accept(animal);
                         });
